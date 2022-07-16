@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const JWT = require("jsonwebtoken");
+const verifyToken = require("./middleware/auth");
 
 const PORT = process.env.PORT || 5000;
 app.use(express.json());
@@ -87,6 +88,13 @@ app.post("/token", (req, res) => {
     console.log(error);
     return res.sendStatus(403);
   }
+});
+
+app.delete("/logout", verifyToken, (req, res) => {
+  const user = users.find((user) => user.id === req.userId);
+  updateRefreshToken(user.username, null);
+
+  return res.sendStatus(204);
 });
 
 app.listen(PORT, () => {
