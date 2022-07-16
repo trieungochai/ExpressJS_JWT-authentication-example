@@ -39,7 +39,7 @@ const generateToken = (payload) => {
     }
   );
 
-  return { refreshToken, accessToken };
+  return { accessToken, refreshToken };
 };
 
 const updateRefreshToken = (username, refreshToken) => {
@@ -56,14 +56,15 @@ const updateRefreshToken = (username, refreshToken) => {
 
 app.post("/login", (req, res) => {
   const { username } = req.body;
-  const user = users.find((user) => user.username === username);
 
+  const user = users.find((user) => user.username === username);
   if (!user) return res.sendStatus(401);
 
   const tokens = generateToken(user);
   updateRefreshToken(username, tokens.refreshToken);
 
-  console.log(users);
+  // console.log("users:", users);
+  // console.log("tokens:", tokens);
 
   return res.status(200).json(tokens);
 });
@@ -76,8 +77,8 @@ app.post("/token", (req, res) => {
   if (!user) return res.sendStatus(403);
 
   try {
-    JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
+    const decoded = JWT.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    console.log("decoded", decoded);
     const tokens = generateToken(user);
     updateRefreshToken(user.username, tokens.refreshToken);
 
