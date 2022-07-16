@@ -39,7 +39,7 @@ app.get("/posts", verifyToken, (req, res) => {
   // res.status(200).json({ posts: "my posts" });
   return res
     .status(200)
-    .json(posts.filter((post) => (post.userId === req.userId)));
+    .json(posts.filter((post) => post.userId === req.userId));
 });
 
 app.post("/login", (req, res) => {
@@ -49,7 +49,9 @@ app.post("/login", (req, res) => {
   if (!user) return res.sendStatus(401);
 
   // Create JWT
-  const accessToken = JWT.sign(user, process.env.ACCESS_TOKEN_SECRET);
+  const accessToken = JWT.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "15s",
+  });
   return res.status(200).json({ accessToken });
 });
 
